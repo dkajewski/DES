@@ -3,18 +3,18 @@ import java.util.Scanner;
 public class Szyfrowanie {
 
 	int[] pPocz¹tkowa={
-			58, 50, 42, 34, 26, 18, 10, 2,
-			60, 52, 44, 36, 28, 20, 12, 4,
-			62, 54, 46, 38, 30, 22, 14, 6,
-			64, 56, 48, 40, 32, 24, 16, 8,
 			57, 49, 41, 33, 25, 17, 9, 1,
 			59, 51, 43, 35, 27, 19, 11, 3,
 			61, 53, 45, 37, 29, 21, 13, 5,
-			63, 55, 47, 39, 31, 23, 15, 7
+			63, 55, 47, 39, 31, 23, 15, 7,
+			56, 48, 40, 32, 24, 16, 8, 0,
+			58, 50, 42, 34, 26, 18, 10, 2,
+			60, 52, 44, 36, 28, 20, 12, 4,
+			62, 54, 46, 38, 30, 22, 14, 6
 	};
 	
-	int[][] lewa = new int[8][4];
-	int[][] prawa = new int[8][4];
+	String[][] lewa = new String[4][8];
+	String[][] prawa = new String[4][8];
 	
 	String kod;
 	String kodBinarnie;
@@ -31,6 +31,9 @@ public class Szyfrowanie {
 		sc.close();
 		kodBinarnie = hexToBinary(kod);
 		podzia³();
+		
+		//System.out.println(kodBinarnie.charAt(57) +" "+ lewa[0][0]);
+		//System.out.println(kodBinarnie.charAt(49) +" "+ lewa[0][1]);
 		
 	}
 	
@@ -96,7 +99,7 @@ public class Szyfrowanie {
 	    	}
 	    }
 	    String bin3 = bit0+bin1+bit8+bin2;
-	    System.out.println(bin3.length());
+	    //System.out.println(bin3.length());
 	    return bin3;
 	}
 	
@@ -106,7 +109,8 @@ public class Szyfrowanie {
 		while(k<=58){
 			for(int i=0; i<4; i++){
 				for(int j=0; j<8; j++){
-					lewa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k]);
+					//System.out.println(k);
+					lewa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
 					switch(k){
 					case 4: case 12: case 20: case 28: case 34: case 42: case 50:
@@ -117,10 +121,10 @@ public class Szyfrowanie {
 			}
 		}
 		k=4;
-		while(k<=64){
+		while(k<=63){
 			for(int i=0; i<4; i++){
 				for(int j=0; j<8; j++){
-					prawa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k]);
+					prawa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
 					switch(k){
 					case 8: case 16: case 24: case 32: case 40: case 48: case 56:
