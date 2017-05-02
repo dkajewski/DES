@@ -1,8 +1,9 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class Szyfrowanie {
 
-	int[] pPocz¹tkowa={
+	byte[] pPocz¹tkowa={
 			57, 49, 41, 33, 25, 17, 9, 1,
 			59, 51, 43, 35, 27, 19, 11, 3,
 			61, 53, 45, 37, 29, 21, 13, 5,
@@ -13,13 +14,31 @@ public class Szyfrowanie {
 			62, 54, 46, 38, 30, 22, 14, 6
 	};
 	
+	byte[] PC1={
+			56, 48, 40, 32, 24, 16, 8,
+			0, 57, 49, 41, 33, 25, 17,
+			9, 1, 58, 50, 42, 34, 26,
+			18, 10, 2, 59, 51, 43, 35,
+			
+			62, 54, 46, 38, 30, 22, 14,
+			6, 61, 53, 45, 37, 29, 21,
+			13, 5, 60, 52, 44, 36, 28,
+			20, 12, 4, 27, 19, 11, 3
+	};
+	
 	String[][] lewa = new String[4][8];
 	String[][] prawa = new String[4][8];
+	String bit56 = "";
+	String lewyKlucz = "";
+	String prawyKlucz = "";
 	
 	String kod;
 	String kodBinarnie;
+	String klucz;
+	String kluczBinarnie;
 	
 	public Szyfrowanie(){
+		String zgoda="y";
 		System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX): ");
 		Scanner sc = new Scanner(System.in);
 		kod = sc.nextLine();
@@ -28,9 +47,26 @@ public class Szyfrowanie {
 			kod = sc.nextLine();
 		}
 		//System.out.println(hexToBinary(kod));
-		sc.close();
+		
 		kodBinarnie = hexToBinary(kod);
 		podzia³();
+		System.out.print("Wygenerowaæ klucz? (y/n): ");
+		zgoda = sc.nextLine().toLowerCase();
+		if(zgoda.equals("y")){
+			generujKlucz();
+			System.out.println("Klucz: "+klucz);
+		}else{
+			klucz="";
+			while(klucz.length()!=16){
+				System.out.print("Podaj klucz 16 znaków (HEX): ");
+				klucz=sc.nextLine();
+			}
+		}
+		
+		kluczBinarnie = hexToBinary(klucz);
+		pPC1();
+		
+		sc.close();
 		
 		//System.out.println(kodBinarnie.charAt(57) +" "+ lewa[0][0]);
 		//System.out.println(kodBinarnie.charAt(49) +" "+ lewa[0][1]);
@@ -106,14 +142,15 @@ public class Szyfrowanie {
 	//podzia³ na lew¹ i praw¹ stronê
 	public void podzia³(){
 		int k=0;
-		while(k<=58){
+		while(k<=60){
 			for(int i=0; i<4; i++){
 				for(int j=0; j<8; j++){
 					//System.out.println(k);
 					lewa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
+					//System.out.println(k+" "+lewa[i][j]+" "+i+" "+j);
 					switch(k){
-					case 4: case 12: case 20: case 28: case 34: case 42: case 50:
+					case 4: case 12: case 20: case 28: case 36: case 44: case 52: case 60:
 						k+=4;
 						break;
 					}
@@ -126,6 +163,7 @@ public class Szyfrowanie {
 				for(int j=0; j<8; j++){
 					prawa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
+					//System.out.println(k+" "+prawa[i][j]+" "+i+" "+j);
 					switch(k){
 					case 8: case 16: case 24: case 32: case 40: case 48: case 56:
 						k+=4;
@@ -134,5 +172,44 @@ public class Szyfrowanie {
 				}
 			}
 		}
+	}
+	
+	public void generujKlucz(){
+		klucz="";
+		Random r = new Random();
+		for(int i=0; i<16; i++){
+			int a = r.nextInt(16);
+			switch(a){
+			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
+				klucz+=a;
+				break;
+			case 10:
+				klucz+="a";
+				break;
+			case 11:
+				klucz+="b";
+				break;
+			case 12: 
+				klucz+="c";
+				break;
+			case 13:
+				klucz+="d";
+				break;
+			case 14:
+				klucz+="e";
+				break;
+			case 15:
+				klucz+="f";
+				break;
+			}
+		}
+	}
+	
+	public void pPC1(){
+		for(int i=0; i<PC1.length; i++){
+			bit56+=kluczBinarnie.charAt(PC1[i]);
+		}
+		lewyKlucz=bit56.substring(0, 28);
+		prawyKlucz=bit56.substring(28, 56);
 	}
 }
