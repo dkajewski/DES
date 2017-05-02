@@ -26,6 +26,17 @@ public class Szyfrowanie {
 			20, 12, 4, 27, 19, 11, 3
 	};
 	
+	byte[] PC2={
+			13, 16, 10, 23, 0, 4,
+			2, 27, 14, 5, 20, 9,
+			22, 18, 11, 3, 25, 7,
+			15, 6, 26, 19, 12, 1,
+			40, 51, 30, 36, 46, 54,
+			29, 39, 50, 44, 32, 47,
+			43, 48, 38, 55, 33, 52,
+			45, 41, 49, 35, 28, 31
+	};
+	
 	String[][] lewa = new String[4][8];
 	String[][] prawa = new String[4][8];
 	String bit56 = "";
@@ -46,7 +57,6 @@ public class Szyfrowanie {
 			System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX): ");
 			kod = sc.nextLine();
 		}
-		//System.out.println(hexToBinary(kod));
 		
 		kodBinarnie = hexToBinary(kod);
 		podzia³();
@@ -65,11 +75,15 @@ public class Szyfrowanie {
 		
 		kluczBinarnie = hexToBinary(klucz);
 		pPC1();
-		
+		//System.out.println(lewyKlucz+" "+prawyKlucz);
+		for(int i=1; i<=16; i++){
+			przesuñBity(i);
+			//System.out.println(lewyKlucz+" "+prawyKlucz);
+			String bit48 = pPC2();
+			
+			//teraz fejstel lol
+		}
 		sc.close();
-		
-		//System.out.println(kodBinarnie.charAt(57) +" "+ lewa[0][0]);
-		//System.out.println(kodBinarnie.charAt(49) +" "+ lewa[0][1]);
 		
 	}
 	
@@ -135,7 +149,6 @@ public class Szyfrowanie {
 	    	}
 	    }
 	    String bin3 = bit0+bin1+bit8+bin2;
-	    //System.out.println(bin3.length());
 	    return bin3;
 	}
 	
@@ -145,10 +158,8 @@ public class Szyfrowanie {
 		while(k<=60){
 			for(int i=0; i<4; i++){
 				for(int j=0; j<8; j++){
-					//System.out.println(k);
 					lewa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
-					//System.out.println(k+" "+lewa[i][j]+" "+i+" "+j);
 					switch(k){
 					case 4: case 12: case 20: case 28: case 36: case 44: case 52: case 60:
 						k+=4;
@@ -163,7 +174,6 @@ public class Szyfrowanie {
 				for(int j=0; j<8; j++){
 					prawa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
 					k++;
-					//System.out.println(k+" "+prawa[i][j]+" "+i+" "+j);
 					switch(k){
 					case 8: case 16: case 24: case 32: case 40: case 48: case 56:
 						k+=4;
@@ -205,11 +215,39 @@ public class Szyfrowanie {
 		}
 	}
 	
+	//permutacja PC-1
 	public void pPC1(){
 		for(int i=0; i<PC1.length; i++){
 			bit56+=kluczBinarnie.charAt(PC1[i]);
 		}
 		lewyKlucz=bit56.substring(0, 28);
 		prawyKlucz=bit56.substring(28, 56);
+	}
+	
+	public void przesuñBity(int i){
+		switch(i){
+		case 1: case 2: case 9: case 16:
+			//przesuwamy bity o 1 w lewo
+			lewyKlucz=lewyKlucz.substring(1, 28)+lewyKlucz.charAt(0);
+			prawyKlucz=prawyKlucz.substring(1, 28)+prawyKlucz.charAt(0);
+			break;
+		case 3: case 4: case 5: case 6: case 7: case 8: case 10:
+		case 11: case 12: case 13: case 14: case 15:
+			//przesuwamy bity o 2 w lewo
+			lewyKlucz=lewyKlucz.substring(2, 28)+lewyKlucz.substring(0, 2);
+			prawyKlucz=prawyKlucz.substring(2, 28)+prawyKlucz.substring(0, 2);
+			break;
+		}
+	}
+	
+	//permutacja PC-2
+	public String pPC2(){
+		String niewiarygodneZjednoczenie=lewyKlucz+prawyKlucz;
+		String wynik="";
+		for(int i=0; i<48; i++){
+			wynik+=niewiarygodneZjednoczenie.charAt(PC2[i]);
+		}
+		return wynik;
+		
 	}
 }
