@@ -95,6 +95,24 @@ public class Szyfrowanie {
 			2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11
 	};
 	
+	byte[] Pblok={
+			15, 6, 19, 20, 28, 11, 27, 16,
+			0, 14, 22, 25, 4, 17, 30, 9,
+			1, 7, 23, 13, 31, 26, 2, 8,
+			18, 12, 29, 5, 21, 10, 3, 24
+	};
+	
+	byte[] Pkoñcowa={
+			39, 7, 47, 15, 55, 23, 63, 31,
+			38, 6, 46, 14, 54, 22, 62, 30,
+			37, 5, 45, 13, 53, 21, 61, 29,
+			36, 4, 44, 12, 52, 20, 60, 28,
+			35, 3, 43, 11, 51, 19, 59, 27,
+			34, 2, 42, 10, 50, 18, 58, 26,
+			33, 1, 41, 9, 49, 17, 57, 25,
+			32, 0, 40, 8, 48, 16, 56, 24
+	};
+	
 	String[][] lewa = new String[4][8];
 	String[][] prawa = new String[4][8];
 	String bit56 = "";
@@ -143,6 +161,7 @@ public class Szyfrowanie {
 		Sbox.add(S8);
 		
 		kluczBinarnie = hexToBinary(klucz);
+		sc.close();
 		pPC1();
 		//System.out.println(lewyKlucz+" "+prawyKlucz);
 		for(int i=1; i<=16; i++){
@@ -152,9 +171,34 @@ public class Szyfrowanie {
 			String rozszerzonaPrawa = pRozszerzaj¹ca();
 			String xorowany = XOR(rozszerzonaPrawa, bit48);
 			String nowaPrawa = sBoxy(xorowany);
-			System.out.println(nowaPrawa);
+			nowaPrawa = pP(nowaPrawa);
+			//System.out.println(nowaPrawa);
+			String lewaStrona = "";
+			for(int j=0; j<4; j++){
+				for(int k=0; k<8; k++){
+					lewaStrona+=lewa[j][k];
+				}
+			}
+			String pomocnik=XOR(lewaStrona, nowaPrawa);
+			for(int j=0; j<4; j++){
+				for(int k=0; k<8; k++){
+					lewa[j][k]=prawa[j][k];
+				}
+			}
+			
+			int licznik=0;
+			for(int j=0; j<4; j++){
+				for(int k=0; k<8; k++){
+					prawa[j][k]=pomocnik.charAt(licznik)+"";
+					licznik++;
+				}
+			}
+			
 		}
-		sc.close();
+		
+		String szyfr = pK();
+		szyfr = BinToHex(szyfr);
+		System.out.println(szyfr);
 		
 	}
 	
@@ -389,6 +433,7 @@ public class Szyfrowanie {
 		return wynik;
 	}
 	
+	//int do binarnego na warzywo
 	public String Bin(byte a){
 		switch(a){
 		case 10:
@@ -425,5 +470,97 @@ public class Szyfrowanie {
 			return "1001";
 			default: return null;
 		}
+	}
+	
+	//permutacja P-bloku
+	public String pP(String dane){
+		String wynik="";
+		for(int i=0; i<32; i++){
+			wynik+=dane.charAt(Pblok[i]);
+		}
+		return wynik;
+	}
+	
+	//permutacja koñcowa
+	public String pK(){
+		String wynik="";
+		String pom="";
+		for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				pom+=lewa[i][j];
+			}
+		}
+		
+		for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				pom+=prawa[i][j];
+			}
+		}
+		
+		for(int i=0; i<pom.length(); i++){
+			wynik+=pom.charAt(Pkoñcowa[i]);
+		}
+		return wynik;
+	}
+	
+	public String BinToHex(String bin){
+		String wynik = "";
+		int licznik = bin.length();
+		while(licznik>0){
+			switch(bin.substring(licznik-4, licznik)){
+			case "0000":
+				wynik= "0"+wynik;
+				break;
+			case "0001":
+				wynik= "1"+wynik;
+				break;
+			case "0010":
+				wynik= "2"+wynik;
+				break;
+			case "0011":
+				wynik= "3"+wynik;
+				break;
+			case "0100":
+				wynik= "4"+wynik;
+				break;
+			case "0101":
+				wynik= "5"+wynik;
+				break;
+			case "0110":
+				wynik= "6"+wynik;
+				break;
+			case "0111":
+				wynik= "7"+wynik;
+				break;
+			case "1000":
+				wynik= "8"+wynik;
+				break;
+			case "1001":
+				wynik= "9"+wynik;
+				break;
+			case "1010":
+				wynik= "a"+wynik;
+				break;
+			case "1011":
+				wynik= "b"+wynik;
+				break;
+			case "1100":
+				wynik= "c"+wynik;
+				break;
+			case "1101":
+				wynik= "d"+wynik;
+				break;
+			case "1110":
+				wynik= "e"+wynik;
+				break;
+			case "1111":
+				wynik= "f"+wynik;
+				break;
+			}
+			
+			licznik-=4;
+		}
+		
+		return wynik;
 	}
 }
