@@ -150,7 +150,16 @@ public class Szyfrowanie {
 				klucz=sc.nextLine();
 			}
 		}
-		
+		/*for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				System.out.print(lewa[i][j]);
+			}
+		}
+		for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				System.out.print(prawa[i][j]);
+			}
+		}*/
 		Sbox.add(S1);
 		Sbox.add(S2);
 		Sbox.add(S3);
@@ -168,7 +177,8 @@ public class Szyfrowanie {
 			przesuñBity(i);
 			//System.out.println(lewyKlucz+" "+prawyKlucz);
 			String bit48 = pPC2();
-			String rozszerzonaPrawa = pRozszerzaj¹ca();
+			System.out.println(bit48);
+			/*String rozszerzonaPrawa = pRozszerzaj¹ca();
 			String xorowany = XOR(rozszerzonaPrawa, bit48);
 			String nowaPrawa = sBoxy(xorowany);
 			nowaPrawa = pP(nowaPrawa);
@@ -192,79 +202,48 @@ public class Szyfrowanie {
 					prawa[j][k]=pomocnik.charAt(licznik)+"";
 					licznik++;
 				}
-			}
+			}*/
 			
 		}
 		
-		String szyfr = pK();
+		/*String szyfr = pK();
 		szyfr = BinToHex(szyfr);
-		System.out.println(szyfr);
+		System.out.println(szyfr);*/
 		
 	}
 	
 	//szesnastkowy kod do binarnego na warzywo
 	String hexToBinary(String hex) {
-		String bin1 = "";
-		String bin2 = "";
-		String bit0 = Integer.toBinaryString(Integer.parseInt(hex.charAt(0)+"", 16));
-		switch(bit0.length()%4){
-		case 1:
-			bit0 = "000"+bit0;
-			break;
-		case 2:
-			bit0 = "00"+bit0;
-			break;
-		case 3:
-			bit0 = "0"+bit0;
-			break;
+		String wynik = "";
+		int d³ugoœæ = hex.length();
+		while(d³ugoœæ>0){
+			switch(hex.charAt(d³ugoœæ-1)+""){
+			case "0": wynik="0000"+wynik; break;
+			case "1": wynik="0001"+wynik; break;
+			case "2": wynik="0010"+wynik; break;
+			case "3": wynik="0011"+wynik; break;
+			case "4": wynik="0100"+wynik; break;
+			case "5": wynik="0101"+wynik; break;
+			case "6": wynik="0110"+wynik; break;
+			case "7": wynik="0111"+wynik; break;
+			case "8": wynik="1000"+wynik; break;
+			case "9": wynik="1001"+wynik; break;
+			case "a": 
+			case "A": wynik="1010"+wynik; break;
+			case "b": 
+			case "B": wynik="1011"+wynik; break;
+			case "c": 
+			case "C": wynik="1100"+wynik; break;
+			case "d": 
+			case "D": wynik="1101"+wynik; break;
+			case "e": 
+			case "E": wynik="1110"+wynik; break;
+			case "f": 
+			case "F": wynik="1111"+wynik; break;
+			}
+			d³ugoœæ--;
 		}
-		String bit8 = Integer.toBinaryString(Integer.parseInt(hex.charAt(8)+"", 16));
-		switch(bit8.length()%4){
-		case 1:
-			bit8 = "000"+bit8;
-			break;
-		case 2:
-			bit8 = "00"+bit8;
-			break;
-		case 3:
-			bit8 = "0"+bit8;
-			break;
-		}
-		String hex1 = hex.substring(1, 8);
-		String hex2 = hex.substring(9);
-	    int i = Integer.parseInt(hex1, 16);
-	    bin1 += Integer.toBinaryString(i);
-	    
-	    if(bin1.length()%4!=0){
-	    	switch(bin1.length()%4){
-	    	case 1:
-	    		bin1 = "000"+bin1;
-	    		break;
-	    	case 2:
-	    		bin1 = "00"+bin1;
-	    		break;
-	    	case 3:
-	    		bin1 = "0"+bin1;
-	    		break;
-	    	}
-	    }
-	    i = Integer.parseInt(hex2, 16);
-	    bin2 += Integer.toBinaryString(i);
-	    if(bin2.length()%4!=0){
-	    	switch(bin2.length()%4){
-	    	case 1:
-	    		bin2 = "000"+bin2;
-	    		break;
-	    	case 2:
-	    		bin2 = "00"+bin2;
-	    		break;
-	    	case 3:
-	    		bin2 = "0"+bin2;
-	    		break;
-	    	}
-	    }
-	    String bin3 = bit0+bin1+bit8+bin2;
-	    return bin3;
+		return wynik;
 	}
 	
 	//podzia³ na lew¹ i praw¹ stronê
@@ -337,6 +316,9 @@ public class Szyfrowanie {
 		}
 		lewyKlucz=bit56.substring(0, 28);
 		prawyKlucz=bit56.substring(28, 56);
+		
+		System.out.println("0: Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
+		
 	}
 	
 	public void przesuñBity(int i){
@@ -345,12 +327,14 @@ public class Szyfrowanie {
 			//przesuwamy bity o 1 w lewo
 			lewyKlucz=lewyKlucz.substring(1, 28)+lewyKlucz.charAt(0);
 			prawyKlucz=prawyKlucz.substring(1, 28)+prawyKlucz.charAt(0);
+			System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
 			break;
 		case 3: case 4: case 5: case 6: case 7: case 8: case 10:
 		case 11: case 12: case 13: case 14: case 15:
 			//przesuwamy bity o 2 w lewo
 			lewyKlucz=lewyKlucz.substring(2, 28)+lewyKlucz.substring(0, 2);
 			prawyKlucz=prawyKlucz.substring(2, 28)+prawyKlucz.substring(0, 2);
+			System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
 			break;
 		}
 	}
@@ -421,8 +405,10 @@ public class Szyfrowanie {
 			switch(wiersz){				
 			case "01":
 				index=16;
+				break;
 			case "10":
 				index=32;
+				break;
 			case "11":
 				index=48;
 				break;
