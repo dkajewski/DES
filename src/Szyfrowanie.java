@@ -150,20 +150,23 @@ public class Szyfrowanie {
 				klucz=sc.nextLine();
 			}
 		}
-		/*for(int i=0; i<4; i++){
-			for(int j=0; j<8; j++){
-				System.out.print(lewa[i][j]);
-			}
-		}*/
 		
-		System.out.println();
-		System.out.println("prawy kod: ");
+		String lewo = "";
 		for(int i=0; i<4; i++){
 			for(int j=0; j<8; j++){
-				System.out.print(prawa[i][j]);
+				lewo+=lewa[i][j];
 			}
 		}
+		
 		System.out.println();
+		String prawo = "";
+		for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				prawo+=prawa[i][j];
+			}
+		}
+		System.out.println("R[0]: "+prawo);
+		System.out.println("L[0]: "+lewo);
 		Sbox.add(S1);
 		Sbox.add(S2);
 		Sbox.add(S3);
@@ -176,8 +179,41 @@ public class Szyfrowanie {
 		kluczBinarnie = hexToBinary(klucz);
 		sc.close();
 		pPC1();
+		
+		przesuñBity(1);
+		String bit48 = pPC2();
+		System.out.println("KS: "+bit48);
+		String rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
+		String xorowany = XOR(rozszerzonaPrawa, bit48);
+		System.out.println("E xor KS: "+xorowany);
+		String nowaPrawa = sBoxy(xorowany);
+		nowaPrawa = pP(nowaPrawa);
+		System.out.println("P: "+nowaPrawa);
+		String pomocnik=XOR(lewo, nowaPrawa);
+		System.out.println("R[1]: "+pomocnik);
+		String nowaLewa = prawo;
+		System.out.println("L[1]: "+nowaLewa);
+		prawo = nowaPrawa;
+		lewo = nowaPrawa;
+		prawyDoLewegoWypijKolego(lewo, prawo);
+		
+		przesuñBity(2);
+		bit48 = pPC2();
+		System.out.println("KS: "+bit48);
+		rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
+		xorowany = XOR(rozszerzonaPrawa, bit48);
+		System.out.println("E xor KS: "+xorowany);
+		nowaPrawa = sBoxy(xorowany);
+		nowaPrawa = pP(nowaPrawa);
+		System.out.println("P: "+nowaPrawa);
+		pomocnik=XOR(lewo, nowaPrawa);
+		System.out.println("R[2]: "+pomocnik);
+		nowaLewa = prawo;
+		System.out.println("L[2]: "+nowaLewa);
+		prawyDoLewegoWypijKolego(lewo, prawo);
+		
 		//System.out.println(lewyKlucz+" "+prawyKlucz);
-		for(int i=1; i<=16; i++){
+		/*for(int i=1; i<=16; i++){
 			przesuñBity(i);
 			//System.out.println(lewyKlucz+" "+prawyKlucz);
 			String bit48 = pPC2();
@@ -186,23 +222,37 @@ public class Szyfrowanie {
 			String xorowany = XOR(rozszerzonaPrawa, bit48);
 			System.out.println("E xor KS: "+xorowany);
 			String nowaPrawa = sBoxy(xorowany);
-			System.out.println(i+" nowa prawa: "+nowaPrawa);
+			//System.out.println(i+" nowa prawa: "+nowaPrawa);
 			nowaPrawa = pP(nowaPrawa);
-			//System.out.println(nowaPrawa);
+			System.out.println("P: "+nowaPrawa);
 			String lewaStrona = "";
 			for(int j=0; j<4; j++){
 				for(int k=0; k<8; k++){
 					lewaStrona+=lewa[j][k];
 				}
 			}
+			
 			String pomocnik=XOR(lewaStrona, nowaPrawa);
+			System.out.println("R: "+pomocnik);
+			String nowaLewa = "";
 			for(int j=0; j<4; j++){
 				for(int k=0; k<8; k++){
-					lewa[j][k]=prawa[j][k];
+					nowaLewa+=prawa[j][k];
 				}
 			}
 			
 			int licznik=0;
+			while(licznik<32){
+				for(int j=0; j<4; j++){
+					for(int k=0; k<8; k++){
+						lewa[j][k]=nowaLewa.charAt(licznik)+"";
+						licznik++;
+					}
+				}
+			}
+			System.out.println("L: "+nowaLewa);
+			
+			licznik=0;
 			for(int j=0; j<4; j++){
 				for(int k=0; k<8; k++){
 					prawa[j][k]=pomocnik.charAt(licznik)+"";
@@ -210,9 +260,10 @@ public class Szyfrowanie {
 				}
 			}
 			
-		}
+		}*/
 		
 		String szyfr = pK();
+		System.out.println("Output: "+szyfr);
 		szyfr = BinToHex(szyfr);
 		System.out.println(szyfr);
 		
@@ -382,14 +433,14 @@ public class Szyfrowanie {
 	
 	
 	//permutacja rozszerzaj¹ca
-	public String pRozszerzaj¹ca(){
+	public String pRozszerzaj¹ca(String prawa){
 		String wynik="";
-		String pom="";
-		for(int i=0; i<4; i++){
+		String pom=prawa;
+		/*for(int i=0; i<4; i++){
 			for(int j=0; j<8; j++){
 				pom+=prawa[i][j];
 			}
-		}
+		}*/
 		for(int i=0; i<48; i++){
 			wynik+=pom.charAt(pR[i]);
 		}
@@ -567,5 +618,18 @@ public class Szyfrowanie {
 		}
 		
 		return wynik;
+	}
+	
+	public void prawyDoLewegoWypijKolego(String lewo, String prawo){
+		int licznik=0;
+		lewa = new String[4][8];
+		prawa = new String[4][8];
+		for(int i=0; i<4; i++){
+			for(int j=0; j<8; j++){
+				lewa[i][j]=lewo.charAt(licznik)+"";
+				prawa[i][j]=prawo.charAt(licznik)+"";
+				licznik++;
+			}
+		}
 	}
 }
