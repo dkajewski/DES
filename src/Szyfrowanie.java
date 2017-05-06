@@ -209,60 +209,6 @@ public class Szyfrowanie {
 			
 		}
 		
-		
-		
-		
-		
-		//System.out.println(lewyKlucz+" "+prawyKlucz);
-		/*for(int i=1; i<=16; i++){
-			przesuñBity(i);
-			//System.out.println(lewyKlucz+" "+prawyKlucz);
-			String bit48 = pPC2();
-			System.out.println("KS: "+bit48);
-			String rozszerzonaPrawa = pRozszerzaj¹ca();
-			String xorowany = XOR(rozszerzonaPrawa, bit48);
-			System.out.println("E xor KS: "+xorowany);
-			String nowaPrawa = sBoxy(xorowany);
-			//System.out.println(i+" nowa prawa: "+nowaPrawa);
-			nowaPrawa = pP(nowaPrawa);
-			System.out.println("P: "+nowaPrawa);
-			String lewaStrona = "";
-			for(int j=0; j<4; j++){
-				for(int k=0; k<8; k++){
-					lewaStrona+=lewa[j][k];
-				}
-			}
-			
-			String pomocnik=XOR(lewaStrona, nowaPrawa);
-			System.out.println("R: "+pomocnik);
-			String nowaLewa = "";
-			for(int j=0; j<4; j++){
-				for(int k=0; k<8; k++){
-					nowaLewa+=prawa[j][k];
-				}
-			}
-			
-			int licznik=0;
-			while(licznik<32){
-				for(int j=0; j<4; j++){
-					for(int k=0; k<8; k++){
-						lewa[j][k]=nowaLewa.charAt(licznik)+"";
-						licznik++;
-					}
-				}
-			}
-			System.out.println("L: "+nowaLewa);
-			
-			licznik=0;
-			for(int j=0; j<4; j++){
-				for(int k=0; k<8; k++){
-					prawa[j][k]=pomocnik.charAt(licznik)+"";
-					licznik++;
-				}
-			}
-			
-		}*/
-		
 		//permutacja koñcowa
 		String szyfr = pK(lewo, prawo);
 		System.out.println("Output: "+szyfr);
@@ -331,34 +277,7 @@ public class Szyfrowanie {
 				}
 			}
 		}
-		/*int k=0;
-		while(k<=60){
-			for(int i=0; i<4; i++){
-				for(int j=0; j<8; j++){
-					lewa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
-					k++;
-					switch(k){
-					case 4: case 12: case 20: case 28: case 36: case 44: case 52: case 60:
-						k+=4;
-						break;
-					}
-				}
-			}
-		}
-		k=4;
-		while(k<=63){
-			for(int i=0; i<4; i++){
-				for(int j=0; j<8; j++){
-					prawa[i][j]=kodBinarnie.charAt(pPocz¹tkowa[k])+"";
-					k++;
-					switch(k){
-					case 8: case 16: case 24: case 32: case 40: case 48: case 56:
-						k+=4;
-						break;
-					}
-				}
-			}
-		}*/
+		
 	}
 	
 	public void generujKlucz(){
@@ -438,11 +357,6 @@ public class Szyfrowanie {
 	public String pRozszerzaj¹ca(String prawa){
 		String wynik="";
 		String pom=prawa;
-		/*for(int i=0; i<4; i++){
-			for(int j=0; j<8; j++){
-				pom+=prawa[i][j];
-			}
-		}*/
 		for(int i=0; i<48; i++){
 			wynik+=pom.charAt(pR[i]);
 		}
