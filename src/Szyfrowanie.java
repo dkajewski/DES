@@ -55,7 +55,7 @@ public class Szyfrowanie {
 	byte[][] S2={
 			{15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10},
 			{3, 13, 4, 7, 15, 2, 8, 14, 12, 0, 1, 10, 6, 9, 11, 5},
-			{0, 14, 7, 11, 10, 4, 13, 1, 5, 7, 12, 6, 9, 3, 2, 15},
+			{0, 14, 7, 11, 10, 4, 13, 1, 5, 8, 12, 6, 9, 3, 2, 15},
 			{13, 8, 10, 1, 3, 15, 4, 2, 11, 6, 7, 12, 0, 5, 14, 9}
 	};
 	byte[][] S3={
@@ -180,37 +180,38 @@ public class Szyfrowanie {
 		sc.close();
 		pPC1();
 		
-		przesuñBity(1);
-		String bit48 = pPC2();
-		System.out.println("KS: "+bit48);
-		String rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
-		String xorowany = XOR(rozszerzonaPrawa, bit48);
-		System.out.println("E xor KS: "+xorowany);
-		String nowaPrawa = sBoxy(xorowany);
-		nowaPrawa = pP(nowaPrawa);
-		System.out.println("P: "+nowaPrawa);
-		String pomocnik=XOR(lewo, nowaPrawa);
-		System.out.println("R[1]: "+pomocnik);
-		String nowaLewa = prawo;
-		System.out.println("L[1]: "+nowaLewa);
-		prawo = nowaPrawa;
-		lewo = nowaPrawa;
-		prawyDoLewegoWypijKolego(lewo, prawo);
+		for(int i=1; i<=16; i++){
+			//przesuniêcie bitów klucza
+			przesuñBity(i);
+			//klucz -> 48 bitów
+			String permutacjaKlucza = pPC2();
+			System.out.println("KS: "+permutacjaKlucza);
+			//rozszerzenie prawej strony kodu
+			String rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
+			System.out.println("E: "+rozszerzonaPrawa);
+			//E xor KS
+			String ExorKS = XOR(rozszerzonaPrawa, permutacjaKlucza);
+			System.out.println("E xor KS: "+ExorKS);
+			//E xor KS do sBoxów
+			String nowaPrawa = sBoxy(ExorKS);
+			//permutacja P-bloku
+			nowaPrawa = pP(nowaPrawa);
+			System.out.println("P: "+nowaPrawa);
+			//XOR na wyniku permutacji P-bloku i lewej 
+			nowaPrawa = XOR(nowaPrawa, lewo);
+			lewo=prawo;
+			prawo=nowaPrawa;
+			System.out.println("L[i]"+lewo);
+			System.out.println("R[i]"+prawo);
+			if(i<16){
+				prawyDoLewegoWypijKolego(lewo, prawo);
+			}
+			
+		}
 		
-		przesuñBity(2);
-		bit48 = pPC2();
-		System.out.println("KS: "+bit48);
-		rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
-		xorowany = XOR(rozszerzonaPrawa, bit48);
-		System.out.println("E xor KS: "+xorowany);
-		nowaPrawa = sBoxy(xorowany);
-		nowaPrawa = pP(nowaPrawa);
-		System.out.println("P: "+nowaPrawa);
-		pomocnik=XOR(lewo, nowaPrawa);
-		System.out.println("R[2]: "+pomocnik);
-		nowaLewa = prawo;
-		System.out.println("L[2]: "+nowaLewa);
-		prawyDoLewegoWypijKolego(lewo, prawo);
+		
+		
+		
 		
 		//System.out.println(lewyKlucz+" "+prawyKlucz);
 		/*for(int i=1; i<=16; i++){
@@ -262,7 +263,8 @@ public class Szyfrowanie {
 			
 		}*/
 		
-		String szyfr = pK();
+		//permutacja koñcowa
+		String szyfr = pK(lewo, prawo);
 		System.out.println("Output: "+szyfr);
 		szyfr = BinToHex(szyfr);
 		System.out.println(szyfr);
@@ -445,7 +447,6 @@ public class Szyfrowanie {
 			wynik+=pom.charAt(pR[i]);
 		}
 		
-		System.out.println("E: "+wynik);
 		return wynik;
 	}
 	
@@ -481,7 +482,7 @@ public class Szyfrowanie {
 		
 		//lecimy do boxów
 		for(int i=0; i<8; i++){
-			String wiersz = tab6bit[i].charAt(0)+""+tab6bit[i].charAt(5)+"";
+			String wiersz = tab6bit[i].charAt(0)+""+tab6bit[i].charAt(5);
 			String kolumna = tab6bit[i].substring(1, 5);
 			wynik+=Bin(Sbox.get(i)[Integer.valueOf(wiersz, 2)][Integer.valueOf(kolumna, 2)]);
 		}
@@ -538,20 +539,9 @@ public class Szyfrowanie {
 	}
 	
 	//permutacja koñcowa
-	public String pK(){
+	public String pK(String lewo, String prawo){
 		String wynik="";
-		String pom="";
-		for(int i=0; i<4; i++){
-			for(int j=0; j<8; j++){
-				pom+=lewa[i][j];
-			}
-		}
-		
-		for(int i=0; i<4; i++){
-			for(int j=0; j<8; j++){
-				pom+=prawa[i][j];
-			}
-		}
+		String pom=prawo+lewo;
 		
 		for(int i=0; i<pom.length(); i++){
 			wynik+=pom.charAt(Pkoñcowa[i]);
