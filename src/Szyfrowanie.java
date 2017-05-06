@@ -124,11 +124,22 @@ public class Szyfrowanie {
 	String klucz;
 	String kluczBinarnie;
 	
+	List<String> CD = new ArrayList<String>();
+	List<String> KS = new ArrayList<String>();
+	List<String> E = new ArrayList<String>();
+	List<String> EKSxor = new ArrayList<String>();
+	List<String> Sboxy = new ArrayList<String>();
+	List<String> P = new ArrayList<String>();
+	List<String> L = new ArrayList<String>();
+	List<String> R = new ArrayList<String>();
+	
 	List<byte[][]> Sbox = new ArrayList<byte[][]>();
 	
 	public Szyfrowanie(){
+		KS.add("0");
 		String zgoda="y";
 		System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX): ");
+		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		kod = sc.nextLine();
 		while(kod.length()!=16){
@@ -165,8 +176,10 @@ public class Szyfrowanie {
 				prawo+=prawa[i][j];
 			}
 		}
-		System.out.println("R[0]: "+prawo);
-		System.out.println("L[0]: "+lewo);
+		//System.out.println("R[0]: "+prawo);
+		R.add(prawo);
+		//System.out.println("L[0]: "+lewo);
+		L.add(lewo);
 		Sbox.add(S1);
 		Sbox.add(S2);
 		Sbox.add(S3);
@@ -177,7 +190,7 @@ public class Szyfrowanie {
 		Sbox.add(S8);
 		
 		kluczBinarnie = hexToBinary(klucz);
-		sc.close();
+		//sc.close();
 		pPC1();
 		
 		for(int i=1; i<=16; i++){
@@ -185,35 +198,43 @@ public class Szyfrowanie {
 			przesuñBity(i);
 			//klucz -> 48 bitów
 			String permutacjaKlucza = pPC2();
-			System.out.println("KS: "+permutacjaKlucza);
+			//System.out.println("KS: "+permutacjaKlucza);
+			KS.add(permutacjaKlucza);
 			//rozszerzenie prawej strony kodu
 			String rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
-			System.out.println("E: "+rozszerzonaPrawa);
+			//System.out.println("E: "+rozszerzonaPrawa);
+			E.add(rozszerzonaPrawa);
 			//E xor KS
 			String ExorKS = XOR(rozszerzonaPrawa, permutacjaKlucza);
-			System.out.println("E xor KS: "+ExorKS);
+			//System.out.println("E xor KS: "+ExorKS);
+			EKSxor.add(ExorKS);
 			//E xor KS do sBoxów
 			String nowaPrawa = sBoxy(ExorKS);
 			//permutacja P-bloku
 			nowaPrawa = pP(nowaPrawa);
-			System.out.println("P: "+nowaPrawa);
+			//System.out.println("P: "+nowaPrawa);
+			P.add(nowaPrawa);
 			//XOR na wyniku permutacji P-bloku i lewej 
 			nowaPrawa = XOR(nowaPrawa, lewo);
 			lewo=prawo;
 			prawo=nowaPrawa;
-			System.out.println("L[i]"+lewo);
-			System.out.println("R[i]"+prawo);
+			//System.out.println("L[i]"+lewo);
+			L.add(lewo);
+			//System.out.println("R[i]"+prawo);
+			R.add(prawo);
 			if(i<16){
 				prawyDoLewegoWypijKolego(lewo, prawo);
 			}
 			
 		}
 		
+		generujRaport();
+		
 		//permutacja koñcowa
 		String szyfr = pK(lewo, prawo);
-		System.out.println("Output: "+szyfr);
+		System.out.println("Output: "+odstêpy8bit(szyfr));
 		szyfr = BinToHex(szyfr);
-		System.out.println(szyfr);
+		System.out.println("Szyfr: "+szyfr);
 		
 	}
 	
@@ -318,8 +339,8 @@ public class Szyfrowanie {
 		}
 		lewyKlucz=bit56.substring(0, 28);
 		prawyKlucz=bit56.substring(28, 56);
-		
-		System.out.println("0: Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
+		CD.add(bit56);
+		//System.out.println("0: Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
 		
 	}
 	
@@ -329,21 +350,23 @@ public class Szyfrowanie {
 			//przesuwamy bity o 1 w lewo
 			lewyKlucz=lewyKlucz.substring(1, 28)+lewyKlucz.charAt(0);
 			prawyKlucz=prawyKlucz.substring(1, 28)+prawyKlucz.charAt(0);
-			System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
+			//System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
 			break;
 		case 3: case 4: case 5: case 6: case 7: case 8: case 10:
 		case 11: case 12: case 13: case 14: case 15:
 			//przesuwamy bity o 2 w lewo
 			lewyKlucz=lewyKlucz.substring(2, 28)+lewyKlucz.substring(0, 2);
 			prawyKlucz=prawyKlucz.substring(2, 28)+prawyKlucz.substring(0, 2);
-			System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
+			//System.out.println(i +": Lewy: "+lewyKlucz+ " Prawy: "+prawyKlucz);
 			break;
 		}
+		
 	}
 	
 	//permutacja PC-2
 	public String pPC2(){
 		String niewiarygodneZjednoczenie=lewyKlucz+prawyKlucz;
+		CD.add(niewiarygodneZjednoczenie);
 		String wynik="";
 		for(int i=0; i<48; i++){
 			wynik+=niewiarygodneZjednoczenie.charAt(PC2[i]);
@@ -400,7 +423,8 @@ public class Szyfrowanie {
 			String kolumna = tab6bit[i].substring(1, 5);
 			wynik+=Bin(Sbox.get(i)[Integer.valueOf(wiersz, 2)][Integer.valueOf(kolumna, 2)]);
 		}
-		System.out.println("sBOX: "+wynik);
+		//System.out.println("sBOX: "+wynik);
+		Sboxy.add(wynik);
 		return wynik;
 	}
 	
@@ -535,5 +559,75 @@ public class Szyfrowanie {
 				licznik++;
 			}
 		}
+	}
+	
+	public void generujRaport(){
+		System.out.println("Input bits: "+odstêpy8bit(kodBinarnie));
+		System.out.println("Key bits:   "+odstêpy8bit(kluczBinarnie));
+		for(int i=0; i<CD.size(); i++){
+			System.out.println("CD["+i+"]: "+odstêpy7bit(CD.get(i)));
+			if(i!=0){
+				System.out.println("KS["+i+"]: "+odstêpy6bit(KS.get(i)));
+			}
+		}
+		System.out.println("L[0]: "+odstêpy8bit(L.get(0)));
+		System.out.println("R[0]: "+odstêpy8bit(R.get(0)));
+		
+		for(int i=0; i<16; i++){
+			System.out.println("Round "+(i+1));
+			System.out.println("E:        "+odstêpy6bit(E.get(i)));
+			System.out.println("KS:       "+odstêpy6bit(KS.get(i+1)));
+			System.out.println("E xor KS: "+odstêpy6bit(EKSxor.get(i)));
+			System.out.println("Sbox:     "+odstêpy4bit(Sboxy.get(i)));
+			System.out.println("P:        "+odstêpy8bit(P.get(i)));
+			System.out.println("L["+(i+1)+"]: "+odstêpy8bit(L.get(i+1)));
+			System.out.println("R["+(i+1)+"]: "+odstêpy8bit(R.get(i+1)));
+			if(i==15){
+				System.out.println("LR[16]: "+odstêpy8bit(R.get(15)+L.get(15)));
+			}
+		}
+	}
+	
+	public String odstêpy8bit(String dane){
+		String wynik="";
+		int a = dane.length();
+		while(a>0){
+			wynik=dane.substring(a-8, a)+" "+wynik;
+			a-=8;
+		}
+		return wynik;
+	}
+	
+	public String odstêpy7bit(String dane){
+		String wynik="";
+		int a = dane.length();
+		while(a>0){
+			wynik=dane.substring(a-7, a)+" "+wynik;
+			a-=7;
+			
+		}
+		return wynik;
+	}
+	
+	public String odstêpy6bit(String dane){
+		String wynik="";
+		int a = dane.length();
+		while(a>0){
+			wynik=dane.substring(a-6, a)+" "+wynik;
+			a-=6;
+			
+		}
+		return wynik;
+	}
+	
+	public String odstêpy4bit(String dane){
+		String wynik="";
+		int a = dane.length();
+		while(a>0){
+			wynik=dane.substring(a-4, a)+" "+wynik;
+			a-=4;
+			
+		}
+		return wynik;
 	}
 }
