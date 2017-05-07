@@ -138,13 +138,24 @@ public class Szyfrowanie {
 	public Szyfrowanie(){
 		KS.add("0");
 		String zgoda="y";
-		System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX): ");
+		System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX lub ASCII): ");
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
 		kod = sc.nextLine();
-		while(kod.length()!=16){
-			System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX): ");
-			kod = sc.nextLine();
+		boolean kontrolka = true;
+		if(kod.length()!=8 && kod.length()!=16){
+			while(kontrolka){
+				System.out.print("Podaj wiadomoœæ do zaszyfrowania (HEX lub ASCII): ");
+				kod = sc.nextLine();
+				if(kod.length()==8 || kod.length()==16){
+					kontrolka=false;
+				}
+			}
+		}
+		
+		
+		if(kod.length()==8){
+			kod = asciiToHex(kod);
 		}
 		
 		kodBinarnie = hexToBinary(kod);
@@ -176,9 +187,7 @@ public class Szyfrowanie {
 				prawo+=prawa[i][j];
 			}
 		}
-		//System.out.println("R[0]: "+prawo);
 		R.add(prawo);
-		//System.out.println("L[0]: "+lewo);
 		L.add(lewo);
 		Sbox.add(S1);
 		Sbox.add(S2);
@@ -190,7 +199,6 @@ public class Szyfrowanie {
 		Sbox.add(S8);
 		
 		kluczBinarnie = hexToBinary(klucz);
-		//sc.close();
 		pPC1();
 		
 		for(int i=1; i<=16; i++){
@@ -198,29 +206,23 @@ public class Szyfrowanie {
 			przesuñBity(i);
 			//klucz -> 48 bitów
 			String permutacjaKlucza = pPC2();
-			//System.out.println("KS: "+permutacjaKlucza);
 			KS.add(permutacjaKlucza);
 			//rozszerzenie prawej strony kodu
 			String rozszerzonaPrawa = pRozszerzaj¹ca(prawo);
-			//System.out.println("E: "+rozszerzonaPrawa);
 			E.add(rozszerzonaPrawa);
 			//E xor KS
 			String ExorKS = XOR(rozszerzonaPrawa, permutacjaKlucza);
-			//System.out.println("E xor KS: "+ExorKS);
 			EKSxor.add(ExorKS);
 			//E xor KS do sBoxów
 			String nowaPrawa = sBoxy(ExorKS);
 			//permutacja P-bloku
 			nowaPrawa = pP(nowaPrawa);
-			//System.out.println("P: "+nowaPrawa);
 			P.add(nowaPrawa);
 			//XOR na wyniku permutacji P-bloku i lewej 
 			nowaPrawa = XOR(nowaPrawa, lewo);
 			lewo=prawo;
 			prawo=nowaPrawa;
-			//System.out.println("L[i]"+lewo);
 			L.add(lewo);
-			//System.out.println("R[i]"+prawo);
 			R.add(prawo);
 			if(i<16){
 				prawyDoLewegoWypijKolego(lewo, prawo);
@@ -234,8 +236,33 @@ public class Szyfrowanie {
 		String szyfr = pK(lewo, prawo);
 		System.out.println("Output: "+odstêpy8bit(szyfr));
 		szyfr = BinToHex(szyfr);
-		System.out.println("Szyfr: "+szyfr);
+		System.out.println("Szyfr (HEX): "+szyfr);
+		//System.out.println("Szyfr (ASCII): "+hexToASCII(szyfr));
 		
+	}
+	
+	//ASCII do HEX
+	public String asciiToHex(String asciiValue)
+	{
+	    char[] chars = asciiValue.toCharArray();
+	    StringBuffer hex = new StringBuffer();
+	    for (int i = 0; i < chars.length; i++)
+	    {
+	        hex.append(Integer.toHexString((int) chars[i]));
+	    }
+	    return hex.toString();
+	}
+	
+	//HEX do ASCII
+	public String hexToASCII(String hexValue)
+	{
+	    StringBuilder output = new StringBuilder("");
+	    for (int i = 0; i < hexValue.length(); i += 2)
+	    {
+	        String str = hexValue.substring(i, i + 2);
+	        output.append((char) Integer.parseInt(str, 16));
+	    }
+	    return output.toString();
 	}
 	
 	//szesnastkowy kod do binarnego na warzywo
@@ -583,7 +610,7 @@ public class Szyfrowanie {
 			System.out.println("L["+(i+1)+"]: "+odstêpy8bit(L.get(i+1)));
 			System.out.println("R["+(i+1)+"]: "+odstêpy8bit(R.get(i+1)));
 			if(i==15){
-				System.out.println("LR[16]: "+odstêpy8bit(R.get(15)+L.get(15)));
+				System.out.println("LR[16]: "+odstêpy8bit(R.get(16)+L.get(16)));
 			}
 		}
 	}
