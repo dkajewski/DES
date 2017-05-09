@@ -87,7 +87,7 @@ public class Deszyfrowanie {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Podaj szyfr: ");
 		szyfr = sc.nextLine();
-		System.out.print("Podaj klucz: ");
+		System.out.print("Podaj klucz (HEX): ");
 		klucz = sc.nextLine();
 
 		if (szyfr.length() == 8) {

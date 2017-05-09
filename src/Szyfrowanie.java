@@ -237,7 +237,7 @@ public class Szyfrowanie {
 		System.out.println("Output: "+odstêpy8bit(szyfr));
 		szyfr = BinToHex(szyfr);
 		System.out.println("Szyfr (HEX): "+szyfr);
-		//System.out.println("Szyfr (ASCII): "+hexToASCII(szyfr));
+		System.out.println("Szyfr (ASCII): "+hexToASCII(szyfr));
 		
 	}
 	
